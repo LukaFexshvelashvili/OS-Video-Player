@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+@theme {
+  --color-main: rgb(79, 117, 255);
+
+  --font-os_regular: "os_regular";
+  --font-os_medium: "os_medium";
+  --font-os_semibold: "os_semibold";
+  --font-os_bold: "os_bold";
+}
+
+@font-face {
+  font-family: os_regular;
+  src: url("assets/fonts/OnService-Regular.woff2");
+}
+@font-face {
+  font-family: os_medium;
+  src: url("assets/fonts/OnService-Medium.woff2");
+}
+@font-face {
+  font-family: os_semibold;
+  src: url("assets/fonts/OnService-SemiBold.woff2");
+}
+@font-face {
+  font-family: os_bold;
+  src: url("assets/fonts/OnService-Bold.woff2");
+}

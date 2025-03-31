@@ -1,4 +1,4 @@
-import OSVideoPlayer from "./OS_PLAYER/OSVideoPlayer";
+import OSVideoPlayer from "./OS_PLAYER/OSVideoProvider";
 
 function App() {
   return (
