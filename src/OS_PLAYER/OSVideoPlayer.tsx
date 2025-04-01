@@ -1,21 +1,199 @@
-import OStimeline from "./components/OStimeline";
-import OScontrols from "./components/OScontrols";
-import { useOSPlayer } from "./OSVideoProvider";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import VideoContainer from "./components/OSVideoContainer";
 
-export default function VideoContainer() {
-  const { videoRef, videoSource } = useOSPlayer();
+interface OSVideoContextType {
+  id: number | string;
+  videoRef: React.RefObject<null | HTMLVideoElement>;
+  playerRef: React.RefObject<null | HTMLDivElement>;
+  isPlaying: boolean;
+  fullscreen: boolean;
+  sound: number;
+  duration: number;
+  currentTime: number;
+  videoSource: string | undefined;
+  currentSource: TEpisode;
+  playerSettings: TplayerSettings;
+  episodes?: TSeriesData;
+  showControls: boolean;
+  play: () => void;
+  pause: () => void;
+  togglePlay: () => void;
+  toggleSound: () => void;
+  changeVideoTime: Function;
+  setVideoSource: Function;
+  toggleFullscreen: () => void;
+  setCurrentSource: Function;
+  setPlayerSettings: Function;
+  changeVideoVolume: Function;
+  FullscreenOn: Function;
+  setShowControls: Function;
+}
+const OSVideoContext = createContext<OSVideoContextType | null>(null);
 
-  return (
-    <div className="h-[600px] aspect-video bg-black flex justify-center items-center relative">
-      <video ref={videoRef} src={videoSource} className="w-full"></video>
+export type TLanguageOptions = {
+  HD?: string;
+  SD?: string;
+};
 
-      {/* BOTTOM CONTROLS */}
-      <div className="absolute w-full bottom-0 h-[50px] bg-[#00000073] px-6 flex justify-center">
-        <div className="w-full h-full flex flex-col select-none">
-          <OStimeline />
-          <OScontrols />
-        </div>
-      </div>
-    </div>
+export type TEpisode = {
+  title?: string;
+  languages: {
+    GEO?: TLanguageOptions;
+    ENG?: TLanguageOptions;
+  };
+};
+
+export type TSeriesData = {
+  [season: number]: TEpisode[];
+};
+
+type TOSplayer = {
+  id: string | number;
+  episodes: TSeriesData;
+  source: TEpisode;
+};
+export type TplayerSettings = {
+  lang: string;
+  quality: string;
+  speed: number;
+};
+
+export default function OSVideoPlayer({ id, episodes, source }: TOSplayer) {
+  const videoRef = useRef<null | HTMLVideoElement>(null);
+  const playerRef = useRef<null | HTMLDivElement>(null);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [sound, setSound] = useState(1);
+  const [previousVolume, setPreviousVolume] = useState(1);
+  const [duration, setDuration] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [showControls, setShowControls] = useState(true);
+  const [currentSource, setCurrentSource] = useState<TEpisode>(source);
+  const [playerSettings, setPlayerSettings] = useState<TplayerSettings>({
+    lang: "GEO",
+    quality: "HD",
+    speed: 1,
+  });
+  const [videoSource, setVideoSource] = useState(
+    source.languages.GEO?.HD
+      ? source.languages.GEO?.HD
+      : source.languages.ENG?.HD
   );
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+
+    const handleLoadedMetadata = () => {
+      if (!isNaN(video.duration)) {
+        setDuration(video.duration);
+      }
+    };
+
+    const handleTimeUpdate = () => setCurrentTime(video.currentTime);
+
+    video.addEventListener("loadeddata", handleLoadedMetadata);
+    video.addEventListener("timeupdate", handleTimeUpdate);
+
+    return () => {
+      video.removeEventListener("loadeddata", handleLoadedMetadata);
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+    };
+  }, [videoSource, videoRef.current]);
+
+  const play = () => {
+    videoRef.current?.play();
+    setIsPlaying(true);
+  };
+
+  const pause = () => {
+    videoRef.current?.pause();
+    setIsPlaying(false);
+  };
+
+  const togglePlay = () => {
+    videoRef.current?.paused ? play() : pause();
+  };
+
+  const toggleSound = () => {
+    if (!videoRef.current) return;
+
+    if (videoRef.current.volume > 0) {
+      setPreviousVolume(videoRef.current.volume);
+      videoRef.current.volume = 0;
+      setSound(0);
+    } else {
+      videoRef.current.volume = previousVolume;
+      setSound(previousVolume);
+    }
+  };
+  const FullscreenOn = () => {
+    setFullscreen(true);
+    playerRef.current?.requestFullscreen();
+    (screen.orientation as any).lock("landscape");
+  };
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      playerRef.current?.requestFullscreen().then(() => setFullscreen(true));
+      (screen.orientation as any).lock("landscape");
+    } else {
+      document.exitFullscreen().then(() => setFullscreen(false));
+      (screen.orientation as any).unlock("landscape");
+    }
+  };
+
+  const changeVideoTime = (time: number) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  const changeVideoVolume = (volume: number) => {
+    if (videoRef.current) {
+      videoRef.current.volume = volume;
+    }
+  };
+  return (
+    <OSVideoContext.Provider
+      value={{
+        id,
+        videoRef,
+        playerRef,
+        episodes,
+        isPlaying,
+        sound,
+        duration,
+        currentTime,
+        videoSource,
+        currentSource,
+        playerSettings,
+        fullscreen,
+        showControls,
+        play,
+        pause,
+        togglePlay,
+        toggleSound,
+        toggleFullscreen,
+        changeVideoTime,
+        setVideoSource,
+        setCurrentSource,
+        setPlayerSettings,
+        changeVideoVolume,
+        setShowControls,
+        FullscreenOn,
+      }}
+    >
+      <VideoContainer />
+    </OSVideoContext.Provider>
+  );
+}
+
+export function useOSPlayer() {
+  const context = useContext(OSVideoContext);
+  if (!context)
+    throw new Error("useOSVideo must be used within an OSVideoProvider");
+  return context;
 }

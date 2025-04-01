@@ -2,11 +2,13 @@
 
 @theme {
   --color-main: rgb(79, 117, 255);
+  --color-mainHover: rgb(103, 136, 255);
 
   --font-os_regular: "os_regular";
   --font-os_medium: "os_medium";
   --font-os_semibold: "os_semibold";
   --font-os_bold: "os_bold";
+  --breakpoint-os_player_mobile: 800px;
 }
 
 @font-face {
@@ -24,4 +26,11 @@
 @font-face {
   font-family: os_bold;
   src: url("assets/fonts/OnService-Bold.woff2");
+}
+
+*::-webkit-scrollbar {
+  width: 3px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-main);
 }
