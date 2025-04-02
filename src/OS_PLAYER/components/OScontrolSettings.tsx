@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { SettingsIcon } from "../../assets/icons/OsIcons";
+import { SettingsIcon } from "./OsIcons";
 import { ControlButton } from "./OScontrols";
 import { TplayerSettings, useOSPlayer } from "../OSVideoPlayer";
 
@@ -42,7 +42,7 @@ export default function OScontrolSettings({}: Props) {
 
   return (
     <>
-      <ControlButton className="relative" ref={settingsBlock}>
+      <ControlButton className="relative select-none" ref={settingsBlock}>
         <div
           className={`h-[auto]  bg-[#252525] absolute bottom-12 right-0 rounded-sm flex flex-col transition-[opacity,visibility] overflow-hidden ${
             showSettings ? "opacity-100 visible" : "opacity-0 invisible"
@@ -77,7 +77,10 @@ export default function OScontrolSettings({}: Props) {
             <SettingsSpeeds back={() => setActiveSection("main")} />
           ) : null}
         </div>
-        <SettingsIcon className="h-4 cursor-pointer" onClick={toggleSettings} />
+        <SettingsIcon
+          className="h-4.5 cursor-pointer"
+          onClick={toggleSettings}
+        />
       </ControlButton>
     </>
   );

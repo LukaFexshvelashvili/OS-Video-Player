@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { CloseIcon } from "../../assets/icons/OsIcons";
+import { CloseIcon } from "./OsIcons";
 import { TEpisode, TplayerSettings, useOSPlayer } from "../OSVideoPlayer";
 
 type Props = {
@@ -18,8 +18,9 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     episodes,
     setVideoSource,
     setCurrentSource,
-    play,
     setPlayerSettings,
+    firstLoad,
+    setFirstLoad,
   } = useOSPlayer();
 
   const episodesList = useRef<null | HTMLDivElement>(null);
@@ -28,7 +29,6 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
   const [current, setCurrent] = useState({ season: 1, episode: 0 });
   const [activeEpisode, setActiveEpisode] = useState<number>(0);
   const [activeSeason, setActiveSeason] = useState<number>(1);
-  const [activeIndex, setActiveIndex] = useState<number>(-1);
 
   useLayoutEffect(() => {
     const storedData = localStorage.getItem("os_player");
@@ -56,11 +56,6 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     setCurrent({ season: activeSeason, episode: activeEpisode });
     saveInStorage({ season: activeSeason, episode: activeEpisode });
   }, [activeEpisode]);
-  useEffect(() => {
-    if (activeIndex !== -1) {
-      play();
-    }
-  }, [activeIndex, activeEpisode]);
 
   useEffect(() => {
     if (episodesList.current) {
@@ -78,7 +73,7 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     episode: string | number;
     season: string | number;
   }) => {
-    if (activeIndex !== -1) {
+    if (!firstLoad) {
       const storedData = localStorage.getItem("os_player");
       let storage: Tstorage[] = storedData ? JSON.parse(storedData) : [];
 
@@ -137,7 +132,7 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
       selectedLang = "ENG";
     }
     if (!notIndex) {
-      setActiveIndex(1);
+      setFirstLoad(false);
     }
     setVideoSource(getURL);
     setCurrentSource(source);

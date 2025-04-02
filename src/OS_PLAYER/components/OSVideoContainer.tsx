@@ -2,15 +2,20 @@ import OStimeline from "./OStimeline";
 import OScontrols from "./OScontrols";
 import { useOSPlayer } from "../OSVideoPlayer";
 import OSepisodesToggler from "./OSepisodesToggler";
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import OSmobileGestures from "./OSmobileGestures";
 import OSstorageSave from "./OSstorageSave";
+import OSloader from "./OSloader";
+import OSerror from "./OSerror";
+import OSvideoShow from "./OSvideoShow";
+import OSthumbnail from "./OSthumbnail";
+
+const OScontextmenu = lazy(() => import("./OScontextmenu"));
 
 export default function VideoContainer() {
   const {
-    videoRef,
     playerRef,
-    videoSource,
+
     togglePlay,
     showControls,
     setShowControls,
@@ -54,20 +59,33 @@ export default function VideoContainer() {
   return (
     <div
       ref={playerRef}
-      className={`h-[600px] max-os_player_mobile:w-full max-os_player_mobile:h-auto aspect-[16/10] bg-black flex justify-center items-center relative overflow-hidden ${
+      className={`h-[600px] max-os_player_mobile:w-full max-os_player_mobile:h-auto aspect-[19/10] bg-black flex justify-center items-center relative overflow-hidden ${
         !showControls ? "cursor-none" : ""
       } `}
     >
+      {/* THUMBNAIL */}
+      <OSthumbnail />
+
+      {/* ERROR */}
+      <OSerror />
+
+      {/* LODADER */}
+      <OSloader />
+
       {/* LOCALSTORAGE */}
       <OSstorageSave />
 
       <OSmobileGestures />
+
+      {/* CONTEXTMENU */}
+      <OScontextmenu items={[]} />
+
       {/* EPISODES TOGGLER */}
       <OSepisodesToggler />
 
       {/* FULL HEIGHT PLAY PAUSE TOGGLE */}
       <div
-        className="h-full w-full absolute top-0 left-0 z-[1]"
+        className="h-full w-full absolute top-0 left-0 z-[1] max-os_player_mobile:hidden"
         onClick={() => {
           togglePlay();
         }}
@@ -76,11 +94,11 @@ export default function VideoContainer() {
           toggleFullscreen();
         }}
       ></div>
+      <OSvideoShow />
 
-      <video ref={videoRef} src={videoSource} className="w-full"></video>
       {/* BOTTOM CONTROLS */}
       <div
-        className={`absolute w-full bottom-0 h-[50px]  px-4 max-os_player_mobile:px-4 flex justify-center transition-[opacity,visibility] z-[5] ${
+        className={`absolute w-full bottom-0  h-[53px]  px-4 max-os_player_mobile:px-4 flex justify-center transition-[opacity,visibility] z-[5] ${
           showControls ? "opacity-100 visible" : "invisible opacity-0"
         }`}
       >

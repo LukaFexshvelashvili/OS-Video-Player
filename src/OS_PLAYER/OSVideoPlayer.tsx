@@ -1,4 +1,13 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import React from "react";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import VideoContainer from "./components/OSVideoContainer";
 
 interface OSVideoContextType {
@@ -9,12 +18,15 @@ interface OSVideoContextType {
   fullscreen: boolean;
   sound: number;
   duration: number;
-  currentTime: number;
   videoSource: string | undefined;
   currentSource: TEpisode;
   playerSettings: TplayerSettings;
   episodes?: TSeriesData;
   showControls: boolean;
+  firstLoad: boolean;
+  thumbnail: string;
+  alt?: string;
+  srcset?: string;
   play: () => void;
   pause: () => void;
   togglePlay: () => void;
@@ -27,6 +39,7 @@ interface OSVideoContextType {
   changeVideoVolume: Function;
   FullscreenOn: Function;
   setShowControls: Function;
+  setFirstLoad: Function;
 }
 const OSVideoContext = createContext<OSVideoContextType | null>(null);
 
@@ -47,18 +60,29 @@ export type TSeriesData = {
   [season: number]: TEpisode[];
 };
 
-type TOSplayer = {
-  id: string | number;
-  episodes: TSeriesData;
-  source: TEpisode;
-};
 export type TplayerSettings = {
   lang: string;
   quality: string;
   speed: number;
 };
 
-export default function OSVideoPlayer({ id, episodes, source }: TOSplayer) {
+type TOSplayer = {
+  id: string | number;
+  episodes?: TSeriesData;
+  source: TEpisode;
+  thumbnail: string;
+  alt?: string;
+  srcset?: string;
+};
+
+export default function OSVideoPlayer({
+  id,
+  episodes,
+  source,
+  thumbnail,
+  alt,
+  srcset,
+}: TOSplayer) {
   const videoRef = useRef<null | HTMLVideoElement>(null);
   const playerRef = useRef<null | HTMLDivElement>(null);
 
@@ -66,8 +90,8 @@ export default function OSVideoPlayer({ id, episodes, source }: TOSplayer) {
   const [sound, setSound] = useState(1);
   const [previousVolume, setPreviousVolume] = useState(1);
   const [duration, setDuration] = useState(0);
+  const [firstLoad, setFirstLoad] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const [currentSource, setCurrentSource] = useState<TEpisode>(source);
   const [playerSettings, setPlayerSettings] = useState<TplayerSettings>({
@@ -81,27 +105,25 @@ export default function OSVideoPlayer({ id, episodes, source }: TOSplayer) {
       : source.languages.ENG?.HD
   );
 
-  useEffect(() => {
-    if (!videoRef.current) return;
-
-    const video = videoRef.current;
-
+  const handleVideoEvents = useCallback((video: HTMLVideoElement) => {
     const handleLoadedMetadata = () => {
       if (!isNaN(video.duration)) {
         setDuration(video.duration);
       }
     };
 
-    const handleTimeUpdate = () => setCurrentTime(video.currentTime);
-
     video.addEventListener("loadeddata", handleLoadedMetadata);
-    video.addEventListener("timeupdate", handleTimeUpdate);
 
     return () => {
       video.removeEventListener("loadeddata", handleLoadedMetadata);
-      video.removeEventListener("timeupdate", handleTimeUpdate);
     };
-  }, [videoSource, videoRef.current]);
+  }, []);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      handleVideoEvents(videoRef.current);
+    }
+  }, [videoRef.current]);
 
   const play = () => {
     videoRef.current?.play();
@@ -147,7 +169,6 @@ export default function OSVideoPlayer({ id, episodes, source }: TOSplayer) {
   const changeVideoTime = (time: number) => {
     if (videoRef.current) {
       videoRef.current.currentTime = time;
-      setCurrentTime(time);
     }
   };
 
@@ -166,14 +187,17 @@ export default function OSVideoPlayer({ id, episodes, source }: TOSplayer) {
         isPlaying,
         sound,
         duration,
-        currentTime,
         videoSource,
         currentSource,
         playerSettings,
         fullscreen,
         showControls,
         play,
+        firstLoad,
         pause,
+        thumbnail,
+        alt,
+        srcset,
         togglePlay,
         toggleSound,
         toggleFullscreen,
@@ -184,6 +208,7 @@ export default function OSVideoPlayer({ id, episodes, source }: TOSplayer) {
         changeVideoVolume,
         setShowControls,
         FullscreenOn,
+        setFirstLoad,
       }}
     >
       <VideoContainer />

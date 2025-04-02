@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PIPIcon } from "../../assets/icons/OsIcons";
+import { PIPIcon } from "./OsIcons";
 import { ControlButton } from "./OScontrols";
 import { useOSPlayer } from "../OSVideoPlayer";
 
@@ -7,7 +7,7 @@ type Props = {};
 
 export default function OScontrolPip({}: Props) {
   const { videoRef, pause } = useOSPlayer();
-  const [isPip, setIsPip] = useState(false);
+  const [_, setIsPip] = useState(false);
 
   const togglePip = async () => {
     if (!videoRef.current) return;
@@ -41,7 +41,7 @@ export default function OScontrolPip({}: Props) {
 
   return (
     <ControlButton onClick={togglePip}>
-      <PIPIcon className="h-4 cursor-pointer" />
+      <PIPIcon className="h-4.5 cursor-pointer" />
     </ControlButton>
   );
 }

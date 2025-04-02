@@ -8,7 +8,7 @@
   --font-os_medium: "os_medium";
   --font-os_semibold: "os_semibold";
   --font-os_bold: "os_bold";
-  --breakpoint-os_player_mobile: 800px;
+  --breakpoint-os_player_mobile: 900px;
 }
 
 @font-face {
@@ -33,4 +33,57 @@
 }
 *::-webkit-scrollbar-thumb {
   background-color: var(--color-main);
+}
+#os_sound_slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  position: relative;
+  cursor: pointer;
+}
+
+#os_sound_slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  position: relative;
+}
+
+#os_sound_slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0px;
+  height: 0px;
+  background: transparent;
+  box-shadow: none;
+}
+
+#os_sound_slider::before {
+  content: "";
+  position: absolute;
+  height: 4px;
+  background: var(--color-main);
+  border-radius: 2px;
+  width: var(--progress);
+
+  top: 50%;
+  left: 0;
+  z-index: 1;
+  transform: translateY(-50%);
+  transition: width 0.1s ease;
+}
+
+#os_sound_slider::-moz-range-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+
+  border-radius: 2px;
+}
+
+#os_sound_slider::-moz-range-progress {
+  background: var(--color-main);
+  height: 4px;
+  border-radius: 2px;
 }

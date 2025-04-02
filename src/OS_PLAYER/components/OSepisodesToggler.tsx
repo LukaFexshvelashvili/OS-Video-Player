@@ -3,8 +3,9 @@ import OSepisodesSelector from "./OSepisodesSelector";
 import { useOSPlayer } from "../OSVideoPlayer";
 
 export default function OSepisodesToggler() {
+  const { showControls, setShowControls, episodes } = useOSPlayer();
+  if (!episodes) return;
   const [show, setShow] = useState(false);
-  const { showControls, setShowControls } = useOSPlayer();
   useEffect(() => {
     if (show) {
       setShowControls(true);
@@ -13,7 +14,7 @@ export default function OSepisodesToggler() {
 
   return (
     <div
-      className={`absolute right-0 top-0 transition-[opacity,visibility] h-full ${
+      className={`absolute z-20 right-0 top-0 transition-[opacity,visibility] h-full select-none ${
         showControls ? "opacity-100 visible" : "invisible opacity-0"
       }`}
     >

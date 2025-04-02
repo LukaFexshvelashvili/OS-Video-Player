@@ -3,14 +3,14 @@ import { useOSPlayer } from "../OSVideoPlayer";
 import { formatTime } from "./OStimeDisplay";
 
 export default function OStimeline() {
-  const { duration, currentTime, changeVideoTime } = useOSPlayer();
+  const { videoRef, duration, changeVideoTime } = useOSPlayer();
   const timeline = useRef<HTMLDivElement | null>(null);
   const timeline_helper = useRef<HTMLDivElement | null>(null);
   const timeline_indicator = useRef<HTMLDivElement | null>(null);
 
-  const [percentage, setPercentage] = useState(0);
-  const isHoveringRef = useRef(false);
-  const isDraggingRef = useRef(false);
+  const percentageRef = useRef<HTMLDivElement>(null);
+  const isHoveringRef = useRef<boolean>(false);
+  const isDraggingRef = useRef<boolean>(false);
 
   const percentage_by_time = (duration: number, currentTime: number) => {
     return duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -69,6 +69,8 @@ export default function OStimeline() {
       );
 
       changeVideoTime(time_by_percentage(duration, percentage));
+      if (percentageRef.current)
+        percentageRef.current.style.width = percentage + "%";
 
       if (!indicator_hide) {
         indicatorShow(offsetX, percentage);
@@ -128,6 +130,14 @@ export default function OStimeline() {
     isDraggingRef.current = false;
     if (!isHoveringRef.current) peekEnd();
   }, []);
+  const updateLine = useCallback(() => {
+    if (!videoRef.current || isNaN(videoRef.current?.duration)) return;
+    let duration = videoRef.current?.duration;
+    if (percentageRef.current) {
+      percentageRef.current.style.width =
+        percentage_by_time(duration, videoRef.current.currentTime) + "%";
+    }
+  }, [videoRef.current?.currentTime, videoRef.current?.duration]);
 
   useEffect(() => {
     const timelineElement = timeline.current;
@@ -144,6 +154,9 @@ export default function OStimeline() {
     });
     document.addEventListener("touchmove", handleTouchMove, { passive: false });
     document.addEventListener("touchend", handleTouchEnd);
+    if (!videoRef.current) return;
+    videoRef.current.addEventListener("timeupdate", updateLine);
+    videoRef.current.addEventListener("load", updateLine);
 
     return () => {
       // Remove mouse event listeners
@@ -155,6 +168,9 @@ export default function OStimeline() {
       timelineElement.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
+      if (!videoRef.current) return;
+      videoRef.current.removeEventListener("timeupdate", updateLine);
+      videoRef.current.removeEventListener("load", updateLine);
     };
   }, [
     handleMouseDown,
@@ -165,13 +181,9 @@ export default function OStimeline() {
     handleTouchEnd,
   ]);
 
-  useEffect(() => {
-    setPercentage(percentage_by_time(duration, currentTime));
-  }, [duration, currentTime]);
-
   return (
     <div
-      className="relative flex w-full h-2 rounded-sm cursor-pointer items-center touch-none"
+      className="relative flex w-full h-2 rounded-sm cursor-pointer items-center touch-none group"
       onMouseMove={(e) => peek(e.clientX)}
       onMouseEnter={() => (isHoveringRef.current = true)}
       onMouseLeave={() => {
@@ -181,18 +193,18 @@ export default function OStimeline() {
       ref={timeline}
     >
       {/* Background track */}
-      <div className="absolute w-full h-[5px] bg-[#dfdfdf38]"></div>
+      <div className="absolute w-full h-[5px] bg-[#dfdfdf38] "></div>
 
       {/* Hover preview track */}
       <div
         ref={timeline_helper}
-        className="h-1 bg-[#dfdfdf38] pointer-events-none"
+        className="h-[5px] bg-[#dfdfdf38] pointer-events-none"
       ></div>
 
       {/* Progress track */}
       <div
-        className="absolute flex items-center h-1 bg-main pointer-events-none before:content-none before:absolute before:right-0 before:translate-x-2/4 before:h-2 before:aspect-square before:rounded-[50%] before:bg-main"
-        style={{ width: `${percentage}%` }}
+        className="absolute flex items-center h-[5px] bg-main pointer-events-none before:content-[''] before:absolute before:right-0 before:translate-x-2/4 before:shadow-lg before:pointer-events-none before:scale-0 before:transition-transform group-hover:before:scale-100 before:h-3 before:aspect-square before:rounded-[50%] before:bg-main"
+        ref={percentageRef}
       ></div>
 
       <div
