@@ -21,11 +21,18 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     setPlayerSettings,
     firstLoad,
     setFirstLoad,
+    thumbnail,
   } = useOSPlayer();
 
   const episodesList = useRef<null | HTMLDivElement>(null);
   if (!episodes) return;
+  function addStringToThumbnail(thumbnailUrl: string, stringToAdd: string) {
+    const fileName = thumbnailUrl.split(".").slice(0, -1).join(".");
+    const fileExtension = thumbnailUrl.split(".").pop();
 
+    const newFileName = `${fileName}${stringToAdd}.${fileExtension}`;
+    return newFileName;
+  }
   const [current, setCurrent] = useState({ season: 1, episode: 0 });
   const [activeEpisode, setActiveEpisode] = useState<number>(0);
   const [activeSeason, setActiveSeason] = useState<number>(1);
@@ -48,6 +55,10 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
           episodes[Number(saved_episode.season)][Number(saved_episode.episode)],
           true
         );
+        setCurrent({
+          season: Number(saved_episode.episode),
+          episode: Number(saved_episode.season),
+        });
       }
     }
   }, []);
@@ -62,13 +73,13 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
       if (current.season == activeSeason) {
         episodesList.current.scrollTo(
           0,
-          40 * activeEpisode + 150 - episodesList.current.clientHeight
+          70 * activeEpisode + 150 - episodesList.current.clientHeight
         );
       } else {
         episodesList.current.scrollTo(0, 0);
       }
     }
-  }, [activeSeason, activeEpisode]);
+  }, [activeSeason, activeEpisode, current.season]);
   const saveInStorage = (info: {
     episode: string | number;
     season: string | number;
@@ -145,18 +156,20 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
   }
   return (
     <div
-      className={`absolute z-[10] bg-[rgba(0,0,0,0.7)] top-0 right-0 w-[230px] h-[350px] flex items-start transition-all max-os_player_mobile:h-full ${
+      className={`absolute z-[10] bg-[rgba(0,0,0,0.7)] top-0 right-0 w-[290px] h-[350px] flex items-start transition-all max-os_player_mobile:h-full ${
         show ? "visible translate-x-0" : "invisible translate-x-4/4"
       }`}
     >
-      <div ref={episodesList} className="w-[170px] h-full overflow-y-auto">
+      <div ref={episodesList} className="w-[230px] h-full overflow-y-auto">
         {episodes[activeSeason].map((episode: TEpisode, i: number) => (
-          <Episode
-            key={i}
+          <EpisodeSkin
+            key={i + "_" + activeSeason}
             index={i}
             active={current.season == activeSeason ? activeEpisode == i : false}
             setActive={setActiveEpisode}
             episodeChange={() => episodeChange(i, episode)}
+            source={episode}
+            thumbnail={addStringToThumbnail(thumbnail, "_sm2")}
           />
         ))}
       </div>
@@ -186,18 +199,48 @@ type Tepisode = {
   setActive: Function;
   index: number;
   episodeChange: Function;
+  source: TEpisode;
+  thumbnail: string;
 };
-function Episode({ active, index, episodeChange }: Tepisode) {
+// function Episode({ active, index, episodeChange }: Tepisode) {
+//   return (
+//     <div
+//       onClick={() => {
+//         episodeChange();
+//       }}
+//       className={`h-[40px] flex items-center px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px] max-os_player_mobile:h-[38px] border-b transition-colors border-[rgba(255,255,255,0.05)] ${
+//         active ? "bg-main" : "hover:bg-[rgba(255,255,255,0.05)]"
+//       } `}
+//     >
+//       {index + 1} ეპიზოდი
+//     </div>
+//   );
+// }
+function EpisodeSkin({
+  active,
+  index,
+  episodeChange,
+  source,
+  thumbnail,
+}: Tepisode) {
+  const isGeo = source.languages.GEO?.HD || source.languages.GEO?.SD;
+  const isEng = source.languages.ENG?.HD || source.languages.ENG?.SD;
   return (
     <div
       onClick={() => {
         episodeChange();
       }}
-      className={`h-[40px] flex items-center px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px] max-os_player_mobile:h-[38px] border-b transition-colors border-[rgba(255,255,255,0.05)] ${
+      className={`h-[70px] py-2 flex gap-2 items-start px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px]  border-b transition-colors border-[rgba(255,255,255,0.05)] ${
         active ? "bg-main" : "hover:bg-[rgba(255,255,255,0.05)]"
       } `}
     >
-      {index + 1} ეპიზოდი
+      <img src={thumbnail} className="h-full aspect-video rounded-sm" />
+      <div className="flex flex-col justify-between h-full">
+        <p>{index + 1} ეპიზოდი</p>
+        <p className="text-[12px] text-[rgba(255,255,255,0.6)]">
+          {isGeo && isEng ? "GEO / ENG" : isGeo ? "GEO" : isEng ? "ENG" : ""}
+        </p>
+      </div>
     </div>
   );
 }
