@@ -55,12 +55,12 @@ export default function OScontrols() {
     <div className="flex flex-1 h-full items-center px-1 w-full z-10 relative gap-3 justify-between">
       {/*  */}
       {/* STARTER */}
-      <div className=" flex items-center gap-[10px]">
+      <div className=" flex items-center gap-[15px] max-os_player_mobile:gap-[10px]">
         <ControlButton onClick={togglePlay}>
           {isPlaying ? (
             <PauseIcon className="h-5 cursor-pointer" />
           ) : (
-            <PlayIcon className="h-6 cursor-pointer" />
+            <PlayIcon className="h-6.5 cursor-pointer" />
           )}
         </ControlButton>
 
@@ -68,7 +68,7 @@ export default function OScontrols() {
         <OStimeDisplay />
       </div>
       {/* END */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-[16px] max-os_player_mobile:gap-[12px]">
         <OScontrolPip />
         <OScontrolSettings />
         <ControlButton onClick={toggleFullscreen}>

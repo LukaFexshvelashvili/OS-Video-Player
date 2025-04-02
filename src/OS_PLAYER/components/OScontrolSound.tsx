@@ -62,7 +62,7 @@ export default function OScontrolSound() {
         )}
       </ControlButton>
 
-      <div className="w-0 flex items-center overflow-hidden transition-[width] group-hover:w-10">
+      <div className="w-0 items-center overflow-hidden transition-[width] hidden group-hover:flex group-hover:w-12">
         <input
           type="range"
           id="os_sound_slider"

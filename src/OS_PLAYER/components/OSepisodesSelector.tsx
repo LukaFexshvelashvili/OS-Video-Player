@@ -68,7 +68,7 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
         episodesList.current.scrollTo(0, 0);
       }
     }
-  }, [activeSeason]);
+  }, [activeSeason, activeEpisode]);
   const saveInStorage = (info: {
     episode: string | number;
     season: string | number;
@@ -193,7 +193,7 @@ function Episode({ active, index, episodeChange }: Tepisode) {
       onClick={() => {
         episodeChange();
       }}
-      className={`h-[40px] flex items-center px-3 text-white font-os_semibold tracking-wider cursor-pointer text-[13px] border-b transition-colors border-[rgba(255,255,255,0.05)] ${
+      className={`h-[40px] flex items-center px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px] max-os_player_mobile:h-[38px] border-b transition-colors border-[rgba(255,255,255,0.05)] ${
         active ? "bg-main" : "hover:bg-[rgba(255,255,255,0.05)]"
       } `}
     >

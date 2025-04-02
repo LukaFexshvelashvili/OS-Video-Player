@@ -24,6 +24,8 @@ interface OSVideoContextType {
   episodes?: TSeriesData;
   showControls: boolean;
   firstLoad: boolean;
+  isLoading: boolean;
+  autoplay?: boolean;
   thumbnail: string;
   alt?: string;
   srcset?: string;
@@ -40,6 +42,7 @@ interface OSVideoContextType {
   FullscreenOn: Function;
   setShowControls: Function;
   setFirstLoad: Function;
+  setIsLoading: Function;
 }
 const OSVideoContext = createContext<OSVideoContextType | null>(null);
 
@@ -73,6 +76,7 @@ type TOSplayer = {
   thumbnail: string;
   alt?: string;
   srcset?: string;
+  autoplay: boolean;
 };
 
 export default function OSVideoPlayer({
@@ -82,11 +86,13 @@ export default function OSVideoPlayer({
   thumbnail,
   alt,
   srcset,
+  autoplay,
 }: TOSplayer) {
   const videoRef = useRef<null | HTMLVideoElement>(null);
   const playerRef = useRef<null | HTMLDivElement>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [sound, setSound] = useState(1);
   const [previousVolume, setPreviousVolume] = useState(1);
   const [duration, setDuration] = useState(0);
@@ -109,6 +115,9 @@ export default function OSVideoPlayer({
     const handleLoadedMetadata = () => {
       if (!isNaN(video.duration)) {
         setDuration(video.duration);
+      }
+      if (autoplay) {
+        play();
       }
     };
 
@@ -196,8 +205,10 @@ export default function OSVideoPlayer({
         firstLoad,
         pause,
         thumbnail,
+        autoplay,
         alt,
         srcset,
+        isLoading,
         togglePlay,
         toggleSound,
         toggleFullscreen,
@@ -209,6 +220,7 @@ export default function OSVideoPlayer({
         setShowControls,
         FullscreenOn,
         setFirstLoad,
+        setIsLoading,
       }}
     >
       <VideoContainer />

@@ -13,19 +13,19 @@
 
 @font-face {
   font-family: os_regular;
-  src: url("assets/fonts/OnService-Regular.woff2");
+  src: url("/assets/fonts/OnService-Regular.woff2");
 }
 @font-face {
   font-family: os_medium;
-  src: url("assets/fonts/OnService-Medium.woff2");
+  src: url("/assets/fonts/OnService-Medium.woff2");
 }
 @font-face {
   font-family: os_semibold;
-  src: url("assets/fonts/OnService-SemiBold.woff2");
+  src: url("/assets/fonts/OnService-SemiBold.woff2");
 }
 @font-face {
   font-family: os_bold;
-  src: url("assets/fonts/OnService-Bold.woff2");
+  src: url("/assets/fonts/OnService-Bold.woff2");
 }
 
 *::-webkit-scrollbar {

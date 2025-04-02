@@ -3,9 +3,11 @@ import { PlayIcon } from "./OsIcons";
 import { useOSPlayer } from "../OSVideoPlayer";
 
 export default function OSthumbnail() {
-  const [start, setStart] = useState(false);
-  const { setFirstLoad, firstLoad, play, thumbnail, alt, srcset } =
+  const { setFirstLoad, firstLoad, play, thumbnail, alt, srcset, autoplay } =
     useOSPlayer();
+  if (autoplay) return;
+  const [start, setStart] = useState(false);
+
   const startMovie = () => {
     setFirstLoad(true);
     play();
@@ -27,8 +29,8 @@ export default function OSthumbnail() {
         />
       ) : null}
       <div className="z-[2] relative flex justify-center items-center h-full w-full top-0 left-0 bg-[rgba(0,0,0,0.05)]">
-        <div className="aspect-square  h-15 flex justify-center items-center rounded-[50%] bg-[rgba(0,0,0,0.5)] ">
-          <PlayIcon className="h-10 translate-x-0.5 opacity-90 " />
+        <div className="aspect-square  h-14 max-os_player_mobile:h-12 flex justify-center items-center rounded-[50%] bg-[rgba(0,0,0,0.5)] ">
+          <PlayIcon className="h-10 max-os_player_mobile:h-8 translate-x-0.5 opacity-90 " />
         </div>
       </div>
     </div>

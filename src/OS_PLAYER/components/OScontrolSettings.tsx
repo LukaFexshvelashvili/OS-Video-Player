@@ -78,7 +78,7 @@ export default function OScontrolSettings({}: Props) {
           ) : null}
         </div>
         <SettingsIcon
-          className="h-4.5 cursor-pointer"
+          className="h-4.5 cursor-pointer max-os_player_mobile:h-4"
           onClick={toggleSettings}
         />
       </ControlButton>

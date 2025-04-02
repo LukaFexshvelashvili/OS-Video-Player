@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useOSPlayer } from "../OSVideoPlayer";
 import { formatTime } from "./OStimeDisplay";
 

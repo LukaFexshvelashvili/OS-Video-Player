@@ -41,7 +41,7 @@ export default function OScontrolPip({}: Props) {
 
   return (
     <ControlButton onClick={togglePip}>
-      <PIPIcon className="h-4.5 cursor-pointer" />
+      <PIPIcon className="h-4.5 cursor-pointer max-os_player_mobile:h-4" />
     </ControlButton>
   );
 }

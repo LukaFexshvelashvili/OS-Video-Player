@@ -10,7 +10,9 @@ export default function OSmobileGestures() {
     FullscreenOn,
     playerRef,
     isPlaying,
+    isLoading,
     togglePlay,
+    setShowControls,
     showControls,
   } = useOSPlayer();
   const tapTimeout = useRef<any>(null);
@@ -66,7 +68,13 @@ export default function OSmobileGestures() {
     } else {
       tapTimeout.current = setTimeout(() => {
         tapTimeout.current = null;
-      }, 300);
+
+        if (showControls) {
+          setShowControls(false);
+        } else {
+          setShowControls(true);
+        }
+      }, 400);
     }
 
     lastTapRef.current = now;
@@ -92,7 +100,10 @@ export default function OSmobileGestures() {
         } `}
       >
         {" "}
-        <ControlButton onClick={togglePlay}>
+        <ControlButton
+          onClick={togglePlay}
+          className={!isLoading ? "opacity-100 visible" : "opacity-0 invisible"}
+        >
           {isPlaying ? (
             <PauseIcon className="h-10 cursor-pointer" />
           ) : (

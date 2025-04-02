@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useOSPlayer } from "../OSVideoPlayer";
 
 export default function OSloader() {
-  const { videoRef } = useOSPlayer();
-  const [isLoading, setIsLoading] = useState(false);
+  const { videoRef, isLoading, setIsLoading } = useOSPlayer();
 
   useEffect(() => {
     if (!videoRef.current) return;

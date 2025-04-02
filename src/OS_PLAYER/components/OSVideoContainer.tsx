@@ -41,7 +41,6 @@ export default function VideoContainer() {
     const player = playerRef.current;
     if (player) {
       player.addEventListener("mousemove", handleMouseMove);
-      player.addEventListener("touchstart", handleMouseMove);
       player.addEventListener("touchmove", handleMouseMove);
       handleMouseMove();
     }
@@ -49,7 +48,6 @@ export default function VideoContainer() {
     return () => {
       if (player) {
         player.removeEventListener("mousemove", handleMouseMove);
-        player.removeEventListener("touchstart", handleMouseMove);
         player.removeEventListener("touchmove", handleMouseMove);
       }
       clearTimeout(timeoutId);
@@ -59,7 +57,7 @@ export default function VideoContainer() {
   return (
     <div
       ref={playerRef}
-      className={`h-[600px] max-os_player_mobile:w-full max-os_player_mobile:h-auto aspect-[19/10] bg-black flex justify-center items-center relative overflow-hidden ${
+      className={`h-full w-full bg-black flex justify-center items-center relative overflow-hidden ${
         !showControls ? "cursor-none" : ""
       } `}
     >
@@ -98,7 +96,7 @@ export default function VideoContainer() {
 
       {/* BOTTOM CONTROLS */}
       <div
-        className={`absolute w-full bottom-0  h-[53px]  px-4 max-os_player_mobile:px-4 flex justify-center transition-[opacity,visibility] z-[5] ${
+        className={`absolute w-full bottom-0  h-[53px]  px-4.5 max-os_player_mobile:px-3 flex justify-center transition-[opacity,visibility] z-[5] ${
           showControls ? "opacity-100 visible" : "invisible opacity-0"
         }`}
       >
