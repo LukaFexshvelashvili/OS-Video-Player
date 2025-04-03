@@ -111,7 +111,7 @@ export default function OScontextmenu({
               key={index}
               onClick={() => !item.disabled && handleAction(item.action)}
               disabled={item.disabled}
-              className={`flex items-center w-full px-3 py-2 font-os_medium text-left text-[12px] tracking-wide text-[rgba(255,255,255,0.9)] hover:bg-[#3d3d3d] transition-colors ${
+              className={`flex items-center cursor-pointer w-full px-3 py-2 font-os_medium text-left text-[12px] tracking-wide text-[rgba(255,255,255,0.9)] hover:bg-[#3d3d3d] transition-colors ${
                 item.disabled ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

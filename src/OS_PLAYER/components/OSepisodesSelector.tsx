@@ -49,37 +49,32 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
         saved_episode.season &&
         saved_episode.episode !== undefined
       ) {
-        setActiveSeason(Number(saved_episode.season));
         episodeChange(
           Number(saved_episode.episode),
           episodes[Number(saved_episode.season)][Number(saved_episode.episode)],
-          true
+          true,
+          Number(saved_episode.season)
         );
         setCurrent({
-          season: Number(saved_episode.episode),
-          episode: Number(saved_episode.season),
+          season: Number(saved_episode.season),
+          episode: Number(saved_episode.episode),
         });
       }
     }
   }, []);
 
   useEffect(() => {
-    setCurrent({ season: activeSeason, episode: activeEpisode });
-    saveInStorage({ season: activeSeason, episode: activeEpisode });
-  }, [activeEpisode]);
-
-  useEffect(() => {
-    if (episodesList.current) {
-      if (current.season == activeSeason) {
-        episodesList.current.scrollTo(
-          0,
-          70 * activeEpisode + 150 - episodesList.current.clientHeight
-        );
-      } else {
-        episodesList.current.scrollTo(0, 0);
-      }
+    if (!episodesList.current || show == false) return;
+    if (activeSeason == current.season) {
+      episodesList.current.scrollTo(
+        0,
+        70 * activeEpisode + 150 - episodesList.current.clientHeight
+      );
+    } else {
+      episodesList.current.scrollTo(0, 0);
     }
-  }, [activeSeason, activeEpisode, current.season]);
+  }, [activeSeason, show]);
+
   const saveInStorage = (info: {
     episode: string | number;
     season: string | number;
@@ -118,8 +113,14 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     }
   };
 
-  function episodeChange(index: number, source: TEpisode, notIndex?: boolean) {
+  function episodeChange(
+    index: number,
+    source: TEpisode,
+    notIndex?: boolean,
+    season?: number
+  ) {
     setActiveEpisode(index);
+
     const getURL =
       source.languages.GEO?.HD ||
       source.languages.GEO?.SD ||
@@ -145,6 +146,9 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     if (!notIndex) {
       setFirstLoad(false);
     }
+    if (season) {
+      setActiveSeason(season);
+    }
     setVideoSource(getURL);
     setCurrentSource(source);
     setPlayerSettings((state: TplayerSettings) => ({
@@ -152,8 +156,12 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
       quality: selectedQuality,
       lang: selectedLang,
     }));
-    setShow(false);
+    setCurrent({ season: season ? season : activeSeason, episode: index });
+    saveInStorage({ season: season ? season : activeSeason, episode: index });
+
+    // setShow(false);
   }
+
   const getThumbnailUrl = (url: string) => {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");
@@ -163,6 +171,7 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     return urlObj.toString();
   };
   const thumbnail_sm = addStringToThumbnail(thumbnail, "_sm2");
+
   return (
     <div
       className={`absolute z-[10] bg-[rgba(0,0,0,0.7)] top-0 right-0 w-[290px] h-[350px] flex items-start transition-all max-os_player_mobile:h-full ${
@@ -196,7 +205,7 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
               key={season}
               active={activeSeason == season}
               setActive={setActiveSeason}
-              index={season}
+              index={Number(season)}
             />
           ))}
         </div>
@@ -248,15 +257,18 @@ function EpisodeSkin({
       onClick={() => {
         episodeChange();
       }}
-      className={`h-[70px] py-2 flex gap-2 items-start px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px]  border-b transition-colors border-[rgba(255,255,255,0.05)] ${
+      className={`select-none h-[70px] py-2 flex gap-2 items-start px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px]  border-b transition-colors border-[rgba(255,255,255,0.05)] ${
         active ? "bg-main" : "hover:bg-[rgba(255,255,255,0.05)]"
       } `}
     >
-      <img
-        src={getThumbnailUrl(getURL)}
-        onError={(e) => (e.currentTarget.src = thumbnail)}
-        className="h-full aspect-video rounded-sm bg-black"
-      />
+      <div className="h-full aspect-video relative bg-black rounded-md overflow-hidden">
+        <div className="absolute z-[1] h-full w-full top-0 left-0"></div>
+        <img
+          src={getThumbnailUrl(getURL)}
+          onError={(e) => (e.currentTarget.src = thumbnail)}
+          className="absolute h-full w-full object-cover  top-0 left-0"
+        />
+      </div>
       <div className="flex flex-col justify-between h-full">
         <p>{index + 1} ეპიზოდი</p>
         <p className="text-[12px] text-[rgba(255,255,255,0.6)]">

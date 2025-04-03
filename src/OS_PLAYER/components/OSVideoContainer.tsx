@@ -14,8 +14,8 @@ const OScontextmenu = lazy(() => import("./OScontextmenu"));
 
 export default function VideoContainer() {
   const {
+    id,
     playerRef,
-
     togglePlay,
     showControls,
     setShowControls,
@@ -76,7 +76,15 @@ export default function VideoContainer() {
       <OSmobileGestures />
 
       {/* CONTEXTMENU */}
-      <OScontextmenu items={[]} />
+      <OScontextmenu
+        items={[
+          {
+            label: "Embed ლინკი",
+            action: () =>
+              navigator.clipboard.writeText("https://player.moviesgo.ge/" + id),
+          },
+        ]}
+      />
 
       {/* EPISODES TOGGLER */}
       <OSepisodesToggler />

@@ -92,7 +92,7 @@ export default function OSVideoPlayer({
   const playerRef = useRef<null | HTMLDivElement>(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [sound, setSound] = useState(1);
   const [previousVolume, setPreviousVolume] = useState(1);
   const [duration, setDuration] = useState(0);
@@ -116,15 +116,20 @@ export default function OSVideoPlayer({
       if (!isNaN(video.duration)) {
         setDuration(video.duration);
       }
+      setIsLoading(false);
       if (autoplay) {
         play();
       }
     };
-
+    const handlePause = () => {
+      pause();
+    };
+    video.addEventListener("pause", handlePause);
     video.addEventListener("loadeddata", handleLoadedMetadata);
 
     return () => {
       video.removeEventListener("loadeddata", handleLoadedMetadata);
+      video.removeEventListener("pause", handlePause);
     };
   }, []);
 
