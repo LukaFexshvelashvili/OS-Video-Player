@@ -154,6 +154,15 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     }));
     setShow(false);
   }
+  const getThumbnailUrl = (url: string) => {
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split("/");
+    pathParts.pop();
+    pathParts.push("thumbnail_sm.webp");
+    urlObj.pathname = pathParts.join("/");
+    return urlObj.toString();
+  };
+  const thumbnail_sm = addStringToThumbnail(thumbnail, "_sm2");
   return (
     <div
       className={`absolute z-[10] bg-[rgba(0,0,0,0.7)] top-0 right-0 w-[290px] h-[350px] flex items-start transition-all max-os_player_mobile:h-full ${
@@ -169,7 +178,8 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
             setActive={setActiveEpisode}
             episodeChange={() => episodeChange(i, episode)}
             source={episode}
-            thumbnail={addStringToThumbnail(thumbnail, "_sm2")}
+            thumbnail={thumbnail_sm}
+            getThumbnailUrl={getThumbnailUrl}
           />
         ))}
       </div>
@@ -201,6 +211,7 @@ type Tepisode = {
   episodeChange: Function;
   source: TEpisode;
   thumbnail: string;
+  getThumbnailUrl: Function;
 };
 // function Episode({ active, index, episodeChange }: Tepisode) {
 //   return (
@@ -222,9 +233,16 @@ function EpisodeSkin({
   episodeChange,
   source,
   thumbnail,
+  getThumbnailUrl,
 }: Tepisode) {
   const isGeo = source.languages.GEO?.HD || source.languages.GEO?.SD;
   const isEng = source.languages.ENG?.HD || source.languages.ENG?.SD;
+  const getURL =
+    source.languages.GEO?.HD ||
+    source.languages.GEO?.SD ||
+    source.languages.ENG?.HD ||
+    source.languages.ENG?.SD;
+
   return (
     <div
       onClick={() => {
@@ -234,7 +252,11 @@ function EpisodeSkin({
         active ? "bg-main" : "hover:bg-[rgba(255,255,255,0.05)]"
       } `}
     >
-      <img src={thumbnail} className="h-full aspect-video rounded-sm" />
+      <img
+        src={getThumbnailUrl(getURL)}
+        onError={(e) => (e.currentTarget.src = thumbnail)}
+        className="h-full aspect-video rounded-sm bg-black"
+      />
       <div className="flex flex-col justify-between h-full">
         <p>{index + 1} ეპიზოდი</p>
         <p className="text-[12px] text-[rgba(255,255,255,0.6)]">

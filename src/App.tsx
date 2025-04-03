@@ -22,7 +22,7 @@ function Player() {
   useEffect(() => {
     if (id && firstRender) {
       axios
-        .get("https://moviesgo.ge/server/getmovie.php?id=" + id)
+        .get("https://moviesgo.ge/server/getmoviet.php?id=" + id)
         .then((response) => {
           setFirstRender(false);
           if (response.data.exists == true) {
