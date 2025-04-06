@@ -60,7 +60,7 @@ export default function OSmobileGestures() {
 
         changeVideoTime(videoRef.current.currentTime + 10);
       } else {
-        changeVideoTime(videoRef.current.currentTime + 10);
+        changeVideoTime(videoRef.current.currentTime - 10);
         if ("vibrate" in navigator) {
           navigator.vibrate(50);
         }

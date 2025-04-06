@@ -24,6 +24,7 @@ export default function OScontrolSound() {
   const handleToggleSound = () => {
     toggleSound();
     setIsMuted(!isMuted);
+    setSound(videoRef.current?.volume || 0);
   };
 
   const volumeUp = () => {

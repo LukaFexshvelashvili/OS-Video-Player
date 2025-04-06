@@ -7,6 +7,7 @@ export default function OSvideoShow() {
 
   useEffect(() => {
     if (!videoSource) return;
+    console.log(videoSource);
 
     const isM3U8 =
       videoSource.endsWith(".m3u8") ||

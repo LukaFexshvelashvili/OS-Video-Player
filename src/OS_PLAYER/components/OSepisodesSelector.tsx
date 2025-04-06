@@ -79,38 +79,36 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     episode: string | number;
     season: string | number;
   }) => {
-    if (!firstLoad) {
-      const storedData = localStorage.getItem("os_player");
-      let storage: Tstorage[] = storedData ? JSON.parse(storedData) : [];
+    const storedData = localStorage.getItem("os_player");
+    let storage: Tstorage[] = storedData ? JSON.parse(storedData) : [];
 
-      let data = storage.find((item) => String(item.id) === String(id));
+    let data = storage.find((item) => String(item.id) === String(id));
 
-      if (data) {
-        data.time = 0;
-        data.episode = {
+    if (data) {
+      data.time = 0;
+      data.episode = {
+        episode: Number(info.episode),
+        season: Number(info.season),
+      };
+    } else {
+      data = {
+        id,
+        time: 0,
+        episode: {
           episode: Number(info.episode),
           season: Number(info.season),
-        };
-      } else {
-        data = {
-          id,
-          time: 0,
-          episode: {
-            episode: Number(info.episode),
-            season: Number(info.season),
-          },
-        };
-        if (storage.length > 5) {
-          storage.splice(4);
-        }
-        storage.unshift(data);
+        },
+      };
+      if (storage.length > 5) {
+        storage.splice(4);
       }
-
-      localStorage.setItem("os_player", JSON.stringify(storage));
-
-      setActiveEpisode(Number(info.episode));
-      setActiveSeason(Number(info.season));
+      storage.unshift(data);
     }
+
+    localStorage.setItem("os_player", JSON.stringify(storage));
+
+    setActiveEpisode(Number(info.episode));
+    setActiveSeason(Number(info.season));
   };
 
   function episodeChange(
@@ -145,7 +143,9 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
     }
     if (!notIndex) {
       setFirstLoad(false);
+      saveInStorage({ season: season ? season : activeSeason, episode: index });
     }
+
     if (season) {
       setActiveSeason(season);
     }
@@ -157,9 +157,8 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
       lang: selectedLang,
     }));
     setCurrent({ season: season ? season : activeSeason, episode: index });
-    saveInStorage({ season: season ? season : activeSeason, episode: index });
 
-    // setShow(false);
+    setShow(false);
   }
 
   const getThumbnailUrl = (url: string) => {
@@ -257,8 +256,10 @@ function EpisodeSkin({
       onClick={() => {
         episodeChange();
       }}
-      className={`select-none h-[70px] py-2 flex gap-2 items-start px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px]  border-b transition-colors border-[rgba(255,255,255,0.05)] ${
-        active ? "bg-main" : "hover:bg-[rgba(255,255,255,0.05)]"
+      className={`select-none h-[70px] py-2 flex gap-2 items-start px-3 text-white font-os_medium tracking-wider cursor-pointer text-[13px] max-os_player_mobile:text-[12px]  outline-b border-l-main transition-colors outline-[rgba(255,255,255,0.05)] ${
+        active
+          ? "bg-mainClear border-l-4 border-l-main hover:bg-mainClearHover"
+          : "hover:bg-[rgba(255,255,255,0.05)]"
       } `}
     >
       <div className="h-full aspect-video relative bg-black rounded-md overflow-hidden">
@@ -267,6 +268,7 @@ function EpisodeSkin({
           src={getThumbnailUrl(getURL)}
           onError={(e) => (e.currentTarget.src = thumbnail)}
           className="absolute h-full w-full object-cover  top-0 left-0"
+          loading="lazy"
         />
       </div>
       <div className="flex flex-col justify-between h-full">

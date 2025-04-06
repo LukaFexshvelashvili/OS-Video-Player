@@ -30,13 +30,19 @@ export default function OStimeDisplay() {
       if (!videoRef.current) return;
       setCurrentTime(videoRef.current.currentTime);
     };
+    const handleSeeked = () => {
+      if (!videoRef.current) return;
+      setCurrentTime(videoRef.current.currentTime);
+    };
 
     videoRef.current.addEventListener("timeupdate", handleTimeUpdate);
+    videoRef.current.addEventListener("seeking", handleSeeked);
 
     return () => {
       if (!videoRef.current) return;
 
       videoRef.current.removeEventListener("timeupdate", handleTimeUpdate);
+      videoRef.current.removeEventListener("seeking", handleSeeked);
     };
   }, [videoSource]);
 

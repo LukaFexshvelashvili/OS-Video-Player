@@ -2,6 +2,8 @@
 
 @theme {
   --color-main: rgb(79, 117, 255);
+  --color-mainClear: rgba(79, 117, 255, 0.15);
+  --color-mainClearHover: rgba(79, 117, 255, 0.2);
   --color-mainHover: rgb(103, 136, 255);
 
   --font-os_regular: "os_regular";

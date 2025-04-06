@@ -121,15 +121,10 @@ export default function OSVideoPlayer({
         play();
       }
     };
-    const handlePause = () => {
-      pause();
-    };
-    video.addEventListener("pause", handlePause);
     video.addEventListener("loadeddata", handleLoadedMetadata);
 
     return () => {
       video.removeEventListener("loadeddata", handleLoadedMetadata);
-      video.removeEventListener("pause", handlePause);
     };
   }, []);
 

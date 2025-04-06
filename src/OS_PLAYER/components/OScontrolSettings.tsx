@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { SettingsIcon } from "./OsIcons";
 import { ControlButton } from "./OScontrols";
-import { TplayerSettings, useOSPlayer } from "../OSVideoPlayer";
+import {
+  TLanguageOptions,
+  TplayerSettings,
+  useOSPlayer,
+} from "../OSVideoPlayer";
 
 type Props = {};
 
@@ -87,9 +91,33 @@ export default function OScontrolSettings({}: Props) {
 }
 
 function SettingsLanguages(props: { back: Function }) {
-  const { currentSource, setPlayerSettings, playerSettings, setVideoSource } =
-    useOSPlayer();
+  const {
+    videoRef,
+    currentSource,
+    setPlayerSettings,
+    playerSettings,
+    setVideoSource,
+  } = useOSPlayer();
+  const changeLanguageSource = (key: string, value: TLanguageOptions) => {
+    const saved_time = videoRef.current?.currentTime ?? 0;
 
+    setPlayerSettings((state: TplayerSettings) => ({
+      ...state,
+      lang: key,
+    }));
+    setVideoSource(value.HD ? value.HD : value.SD);
+
+    const handleLoaded = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = saved_time;
+        videoRef.current.removeEventListener("loadedmetadata", handleLoaded);
+      }
+    };
+
+    if (videoRef.current) {
+      videoRef.current.addEventListener("loadedmetadata", handleLoaded);
+    }
+  };
   return (
     <div className="flex flex-col w-[100px]">
       <SettingsButtonInside
@@ -100,16 +128,11 @@ function SettingsLanguages(props: { back: Function }) {
       />
       {Object.entries(currentSource.languages).map(([key, value]) => (
         <SettingsButtonInside
+          key={key}
           center
           title={key}
           isActive={key == playerSettings.lang}
-          onClick={() => {
-            setPlayerSettings((state: TplayerSettings) => ({
-              ...state,
-              lang: key,
-            }));
-            setVideoSource(value.HD ? value.HD : value.SD);
-          }}
+          onClick={() => changeLanguageSource(key, value)}
         />
       ))}
     </div>
@@ -118,11 +141,38 @@ function SettingsLanguages(props: { back: Function }) {
 
 type LanguageKey = "GEO" | "ENG";
 function SettingsQualities(props: { back: Function }) {
-  const { currentSource, setPlayerSettings, playerSettings, setVideoSource } =
-    useOSPlayer();
+  const {
+    videoRef,
+    currentSource,
+    setPlayerSettings,
+    playerSettings,
+    setVideoSource,
+  } = useOSPlayer();
   const [quality, setQuality] = useState<number | string>(
     playerSettings.quality
   );
+  const changeQualitySource = (key: string, value: string) => {
+    const saved_time = videoRef.current?.currentTime ?? 0;
+
+    setQuality(key);
+    setPlayerSettings((state: TplayerSettings) => ({
+      ...state,
+      quality: key,
+    }));
+
+    const handleLoaded = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = saved_time;
+        videoRef.current.removeEventListener("loadedmetadata", handleLoaded);
+      }
+    };
+
+    if (videoRef.current) {
+      videoRef.current.addEventListener("loadedmetadata", handleLoaded);
+    }
+
+    setVideoSource(value);
+  };
 
   return (
     <div className="flex flex-col w-[100px]">
@@ -137,17 +187,11 @@ function SettingsQualities(props: { back: Function }) {
           currentSource.languages[playerSettings.lang as LanguageKey]!
         ).map(([key, value]) => (
           <SettingsButtonInside
+            key={key}
             center
             title={key}
             isActive={key == quality}
-            onClick={() => {
-              setQuality(key);
-              setPlayerSettings((state: TplayerSettings) => ({
-                ...state,
-                quality: key,
-              }));
-              setVideoSource(value);
-            }}
+            onClick={() => changeQualitySource(key, value)}
           />
         ))}
     </div>
@@ -170,6 +214,7 @@ function SettingsSpeeds(props: { back: Function }) {
       />
       {speedList.map((link_speed: number) => (
         <SettingsButtonInside
+          key={link_speed}
           center
           title={`${link_speed}`}
           isActive={speed == link_speed}
