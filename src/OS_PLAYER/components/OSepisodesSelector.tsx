@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { CloseIcon } from "./OsIcons";
 import { TEpisode, TplayerSettings, useOSPlayer } from "../OSVideoPlayer";
 
@@ -15,11 +21,11 @@ type Tstorage = {
 export default function OSepisodesSelector({ show, setShow }: Props) {
   const {
     id,
+    videoRef,
     episodes,
     setVideoSource,
     setCurrentSource,
     setPlayerSettings,
-    firstLoad,
     setFirstLoad,
     thumbnail,
   } = useOSPlayer();
@@ -37,6 +43,32 @@ export default function OSepisodesSelector({ show, setShow }: Props) {
   const [activeEpisode, setActiveEpisode] = useState<number>(0);
   const [activeSeason, setActiveSeason] = useState<number>(1);
 
+  const videoEnded = useCallback(() => {
+    if (episodes[activeSeason][activeEpisode + 1]) {
+      episodeChange(
+        activeEpisode + 1,
+        episodes[activeSeason][activeEpisode + 1]
+      );
+    } else {
+      if (episodes[activeSeason + 1][0]) {
+        episodeChange(
+          0,
+          episodes[activeSeason + 1][0],
+          false,
+          activeSeason + 1
+        );
+      }
+    }
+  }, [activeEpisode]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    videoRef.current.addEventListener("ended", videoEnded);
+    return () => {
+      if (!videoRef.current) return;
+      videoRef.current.removeEventListener("ended", videoEnded);
+    };
+  }, [activeEpisode]);
   useLayoutEffect(() => {
     const storedData = localStorage.getItem("os_player");
     let storage: Tstorage[] = storedData ? JSON.parse(storedData) : [];

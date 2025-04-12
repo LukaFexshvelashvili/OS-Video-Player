@@ -7,8 +7,6 @@ export default function OSvideoShow() {
 
   useEffect(() => {
     if (!videoSource) return;
-    console.log(videoSource);
-
     const isM3U8 =
       videoSource.endsWith(".m3u8") ||
       videoSource.includes(".m3u8?") ||
@@ -44,5 +42,5 @@ export default function OSvideoShow() {
     }
   }, [videoSource, videoRef, firstLoad]);
 
-  return <video ref={videoRef} className="w-full" />;
+  return <video ref={videoRef} className="w-full h-full" />;
 }
