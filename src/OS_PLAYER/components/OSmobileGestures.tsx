@@ -1,9 +1,20 @@
 import { useEffect, useRef } from "react";
-import { useOSPlayer } from "../OSVideoPlayer";
+import { ControlButton } from "./OScontrols";
+import { PauseIcon, PlayIcon } from "./OsIcons";
+import useOSPlayer from "./useOSPlayer";
 
 export default function OSmobileGestures() {
-  const { changeVideoTime, FullscreenOn, currentTime, playerRef, isPlaying } =
-    useOSPlayer();
+  const {
+    videoRef,
+    changeVideoTime,
+    FullscreenOn,
+    playerRef,
+    isPlaying,
+    isLoading,
+    togglePlay,
+    setShowControls,
+    showControls,
+  } = useOSPlayer();
   const tapTimeout = useRef<any>(null);
   const lastTapRef = useRef<number>(0);
 
@@ -37,18 +48,19 @@ export default function OSmobileGestures() {
   }, [isPlaying, playerRef]);
 
   const handleTap = (direction: "forward" | "backward") => {
+    if (!videoRef.current) return;
     const now = Date.now();
     const tapGap = now - lastTapRef.current;
-
     if (tapGap < 300) {
       if (tapTimeout.current) clearTimeout(tapTimeout.current);
       if (direction == "forward") {
-        changeVideoTime(currentTime + 10);
         if ("vibrate" in navigator) {
           navigator.vibrate(50);
         }
+
+        changeVideoTime(videoRef.current.currentTime + 10);
       } else {
-        changeVideoTime(currentTime + 10);
+        changeVideoTime(videoRef.current.currentTime - 10);
         if ("vibrate" in navigator) {
           navigator.vibrate(50);
         }
@@ -56,7 +68,13 @@ export default function OSmobileGestures() {
     } else {
       tapTimeout.current = setTimeout(() => {
         tapTimeout.current = null;
-      }, 300);
+
+        if (showControls) {
+          setShowControls(false);
+        } else {
+          setShowControls(true);
+        }
+      }, 400);
     }
 
     lastTapRef.current = now;
@@ -65,17 +83,34 @@ export default function OSmobileGestures() {
   return (
     <>
       <div
-        className="z-[2] absolute h-full w-[35%] hidden left-0 max-os_player_mobile:block"
+        className="z-[4] absolute h-full w-[35%] hidden left-0 max-os_player_mobile:block"
         onTouchStart={() => {
           handleTap("backward");
         }}
       ></div>
       <div
-        className="z-[2] absolute h-full w-[35%] hidden right-0 max-os_player_mobile:block"
+        className="z-[4] absolute h-full w-[35%] hidden right-0 max-os_player_mobile:block"
         onTouchStart={() => {
           handleTap("forward");
         }}
       ></div>
+      <div
+        className={`absolute h-18 z-[5] aspect-square justify-center items-center hidden max-os_player_mobile:flex transition-[opacity,visibility] ${
+          showControls ? "opacity-100 visible" : "opacity-0 invisible"
+        } `}
+      >
+        {" "}
+        <ControlButton
+          onClick={togglePlay}
+          className={!isLoading ? "opacity-100 visible" : "opacity-0 invisible"}
+        >
+          {isPlaying ? (
+            <PauseIcon className="h-10 cursor-pointer" />
+          ) : (
+            <PlayIcon className="h-12 cursor-pointer" />
+          )}
+        </ControlButton>
+      </div>
     </>
   );
 }

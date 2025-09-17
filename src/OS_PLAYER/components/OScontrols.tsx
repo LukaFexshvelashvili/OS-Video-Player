@@ -3,93 +3,146 @@ import {
   FullscreenOnIcon,
   PauseIcon,
   PlayIcon,
-  SoundIcon,
-  SoundOffIcon,
-} from "../../assets/icons/OsIcons";
-import { useOSPlayer } from "../OSVideoPlayer";
+  PrevEpisodeIcon,
+  NextEpisodeIcon,
+  TheaterModeIcon,
+  VideoStretchIcon,
+} from "./OsIcons";
 import OStimeDisplay from "./OStimeDisplay";
 import OScontrolPip from "./OScontrolPip";
 import OScontrolSettings from "./OScontrolSettings";
 import { OSkeyHandler } from "./OSkeyHandler";
+import OScontrolSound from "./OScontrolSound";
+import useOSPlayer from "./useOSPlayer";
+import { Link } from "react-router";
 
 export default function OScontrols() {
   const {
+    playerRef,
     videoRef,
     isPlaying,
     fullscreen,
     duration,
-    sound,
-    toggleSound,
     toggleFullscreen,
     togglePlay,
-    currentTime,
     changeVideoTime,
-    changeVideoVolume,
+    goToPreviousEpisode,
+    goToNextEpisode,
+    isMovie,
+    episodes,
+    canGoToPreviousEpisode,
+    canGoToNextEpisode,
+    theaterMode,
+    videoStretch,
+    toggleTheaterMode,
+    toggleVideoStretch,
   } = useOSPlayer();
 
   const skipRight = () => {
-    changeVideoTime(currentTime + 10 > duration ? duration : currentTime + 10);
+    if (!videoRef.current) return;
+    changeVideoTime(
+      videoRef.current?.currentTime + 10 > duration
+        ? duration
+        : videoRef.current?.currentTime + 10
+    );
   };
   const skipLeft = () => {
-    changeVideoTime(currentTime - 10 < 0 ? 0 : currentTime - 10);
+    if (!videoRef.current) return;
+
+    changeVideoTime(
+      videoRef.current?.currentTime - 10 < 0
+        ? 0
+        : videoRef.current?.currentTime - 10
+    );
   };
-  const volumeUp = () => {
-    if (videoRef.current) {
-      changeVideoVolume(
-        videoRef.current.volume + 0.1 > 1
-          ? 1
-          : (videoRef.current.volume + 0.1).toFixed(2)
-      );
-    }
-  };
-  const volumeDown = () => {
-    if (videoRef.current) {
-      changeVideoVolume(
-        videoRef.current.volume - 0.1 < 0
-          ? 0
-          : (videoRef.current.volume - 0.1).toFixed(2)
-      );
-    }
-  };
-  OSkeyHandler({
-    Space: togglePlay,
-    KeyF: toggleFullscreen,
-    ArrowRight: skipRight,
-    ArrowLeft: skipLeft,
-    ArrowUp: volumeUp,
-    ArrowDown: volumeDown,
-  });
+
+  OSkeyHandler(
+    {
+      Space: togglePlay,
+      KeyF: toggleFullscreen,
+      ArrowRight: skipRight,
+      ArrowLeft: skipLeft,
+    },
+    playerRef
+  );
 
   return (
-    <div className="flex flex-1 h-full items-center px-1 w-full z-10 relative gap-3 justify-between">
+    <div className="flex flex-1 h-full items-center px-1 w-full z-10 relative gap-3 justify-between select-none">
+      {/*  */}
       {/* STARTER */}
-      <div className=" flex items-center gap-2">
-        <ControlButton onClick={togglePlay}>
+      <div className=" flex items-center gap-[10px] max-os_player_mobile:gap-[10px]">
+        {/* Previous Episode Button - only show for series */}
+        {!isMovie && episodes && canGoToPreviousEpisode && (
+          <ControlButton
+            onClick={goToPreviousEpisode}
+            className={`w-6 flex justify-center items-center transition-opacity text-white opacity-100 cursor-pointer `}
+          >
+            <PrevEpisodeIcon className="mobile:h-5 h-4.5" />
+          </ControlButton>
+        )}
+
+        <ControlButton
+          onClick={togglePlay}
+          className="w-6 flex justify-center items-center"
+        >
           {isPlaying ? (
-            <PauseIcon className="h-4.5 cursor-pointer" />
+            <PauseIcon className="mobile:h-5 h-4.5 cursor-pointer" />
           ) : (
-            <PlayIcon className="h-4.5 cursor-pointer" />
+            <PlayIcon className="mobile:h-6.5 h-6 cursor-pointer" />
           )}
         </ControlButton>
 
-        <ControlButton onClick={toggleSound}>
-          {sound != 0 ? (
-            <SoundIcon className="h-5 cursor-pointer" />
-          ) : (
-            <SoundOffIcon className="h-5 cursor-pointer" />
-          )}
-        </ControlButton>
+        {/* Next Episode Button - only show for series */}
+        {!isMovie && episodes && canGoToNextEpisode && (
+          <ControlButton
+            onClick={goToNextEpisode}
+            className={`w-6 flex justify-center items-center transition-opacity opacity-100 cursor-pointer `}
+          >
+            <NextEpisodeIcon className="mobile:h-5 h-4.5" />
+          </ControlButton>
+        )}
+
+        <OScontrolSound />
         <OStimeDisplay />
       </div>
       {/* END */}
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-[16px] max-os_player_mobile:gap-[14px]">
+        <Link
+          to={"https://croconet.co"}
+          className=" text-xs hidden 600:block  font-mainSemiBold"
+          target="_blank"
+        >
+          CROCO<span className="text-main  ">NET</span>
+          .CO
+        </Link>
+        {/* Theater Mode Button */}
+        <div className="hidden gap-[16px] items-center mobile:flex">
+          <ControlButton onClick={toggleTheaterMode}>
+            <TheaterModeIcon
+              className={`mobile:h-5.5 h-4 cursor-pointer ${
+                theaterMode ? "[&>path]:fill-main" : ""
+              }`}
+            />
+          </ControlButton>
+
+          {/* Video Stretch Button */}
+          <ControlButton onClick={toggleVideoStretch}>
+            <VideoStretchIcon
+              className={`mobile:h-5 h-4 cursor-pointer ${
+                videoStretch ? "[&>path]:fill-main [&>path]:stroke-main" : ""
+              }`}
+            />
+          </ControlButton>
+        </div>
+
         <OScontrolPip />
         <OScontrolSettings />
+
         <ControlButton onClick={toggleFullscreen}>
           {fullscreen ? (
-            <FullscreenOffIcon className="h-4.5 cursor-pointer" />
+            <FullscreenOffIcon className="mobile:h-4.5 h-4 cursor-pointer [&>path]:fill-main" />
           ) : (
-            <FullscreenOnIcon className="h-4.5 cursor-pointer" />
+            <FullscreenOnIcon className="mobile:h-4.5 h-4 cursor-pointer" />
           )}
         </ControlButton>
       </div>

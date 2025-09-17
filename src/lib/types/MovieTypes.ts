@@ -1,0 +1,68 @@
+export type TMovie = {
+  id: number;
+  mid: number;
+  name_eng: string;
+  name: string;
+  subtitle?: string | null;
+  year: string;
+  country: string;
+  imdb: string;
+  creator: string;
+  actors?: string | null;
+  description: string;
+  players: string;
+  trailer?: string | null;
+  poster_url: string | null;
+  thumbnail_url: string | null;
+  like_count: number;
+  dislike_count: number;
+  type: number;
+  addons: string;
+  genres?: string | null;
+  views?: number | null;
+  create_date: string;
+};
+export type TMovieCard = {
+  id: number;
+  mid: number;
+  name_eng: string;
+  name: string;
+  subtitle?: string | null;
+  year: string;
+  country: string;
+  imdb: string;
+  creator: string;
+  actors?: string | null;
+  description: string;
+  players: string;
+  trailer?: string | null;
+  poster_url?: string | null;
+  thumbnail_url?: string | null;
+  type: number;
+  addons: string;
+  genres?: string | null;
+  views?: number | null;
+  create_date: string;
+  episode_count?: number | null;
+  season_count?: number | null;
+};
+
+export type TCast = {
+  adult: boolean;
+  gender: string;
+  id: string;
+  known_for_department: string;
+  name: string;
+  original_name: string;
+  popularity: number;
+  profile_path: string | null;
+  cast_id: string;
+  character: string;
+  credit_id: string;
+  order: string;
+};
+export type TMovieCardWide = {
+  movie: TMovie;
+  small?: boolean;
+  mobile_full?: boolean;
+};

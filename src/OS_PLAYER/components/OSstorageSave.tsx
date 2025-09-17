@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useOSPlayer } from "../OSVideoPlayer";
+import useOSPlayer from "./useOSPlayer";
 
 type Tstorage = {
   id: number | string;

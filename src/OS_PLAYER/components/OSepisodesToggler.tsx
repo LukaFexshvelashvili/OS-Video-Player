@@ -1,31 +1,44 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import OSepisodesSelector from "./OSepisodesSelector";
-import { useOSPlayer } from "../OSVideoPlayer";
+import useOSPlayer from "./useOSPlayer";
+import { EpisodeSelectorIcon } from "./OsIcons";
 
 export default function OSepisodesToggler() {
-  const [show, setShow] = useState(false);
-  const { showControls, setShowControls } = useOSPlayer();
-  useEffect(() => {
-    if (show) {
-      setShowControls(true);
-    }
-  }, [showControls]);
+  const { showControls, episodes } = useOSPlayer();
+  const [episodesToggler, setEpisodesToggler] = useState<boolean>(false);
+
+  if (!episodes) return null;
 
   return (
-    <div
-      className={`absolute right-0 top-0 transition-[opacity,visibility] h-full ${
-        showControls ? "opacity-100 visible" : "invisible opacity-0"
-      }`}
-    >
+    <>
       <div
-        onClick={() => setShow(true)}
-        className={`absolute z-[2] cursor-pointer w-[130px] h-[32px] text-white font-os_bold tracking-wider flex justify-center items-center text-sm bg-main hover:bg-mainHover rounded-md top-3 right-3 transition-all ${
-          !show ? "opacity-100 visible" : "invisible opacity-0"
+        className={`h-full flex-1 min-w-[350px] shrink-0 max-mobile:w-full max-mobile:h-[100dvh] max-mobile:fixed max-mobile:top-0 max-mobile:left-0 z-60 mobile:z-[21] transition-transform  ${
+          episodesToggler
+            ? "max-mobile:translate-x-0"
+            : "max-mobile:translate-x-full"
+        } ${
+          true
+            ? episodesToggler
+              ? "mobile:right-0 mobile:translate-x-0/4"
+              : "mobile:absolute mobile:right-0 mobile:translate-x-4/4"
+            : ""
         }`}
       >
-        ეპიზოდები
+        <OSepisodesSelector closeToggler={() => setEpisodesToggler(false)} />
       </div>
-      <OSepisodesSelector show={show} setShow={setShow} />
-    </div>
+
+      <div
+        onClick={() => setEpisodesToggler((state) => !state)}
+        className={`cursor-pointer h-[50px] w-[65px] bg-navBg absolute bottom-0 z-[15] right-0 transition-[opacity,visibility] justify-center items-center flex  ${
+          true
+            ? showControls
+              ? "opacity-100 visible z-40 top-0 translate-y-0"
+              : "opacity-0 invisible z-40 top-0 translate-y-0"
+            : "mobile:hidden translate-y-full"
+        }`}
+      >
+        <EpisodeSelectorIcon />
+      </div>
+    </>
   );
 }

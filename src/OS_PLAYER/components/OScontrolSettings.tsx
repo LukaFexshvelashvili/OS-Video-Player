@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { SettingsIcon } from "../../assets/icons/OsIcons";
+import { SettingsIcon } from "./OsIcons";
 import { ControlButton } from "./OScontrols";
-import { TplayerSettings, useOSPlayer } from "../OSVideoPlayer";
+import { TLanguageOptions, TplayerSettings } from "../OSVideoPlayer";
+import useOSPlayer from "./useOSPlayer";
 
 type Props = {};
 
@@ -42,9 +43,9 @@ export default function OScontrolSettings({}: Props) {
 
   return (
     <>
-      <ControlButton className="relative" ref={settingsBlock}>
+      <ControlButton className="relative select-none" ref={settingsBlock}>
         <div
-          className={`h-[auto]  bg-[#252525] absolute bottom-12 right-0 rounded-sm flex flex-col transition-[opacity,visibility] overflow-hidden ${
+          className={`h-[auto]  bg-[#252525] absolute bottom-12 right-0 flex flex-col transition-[opacity,visibility] overflow-hidden ${
             showSettings ? "opacity-100 visible" : "opacity-0 invisible"
           }`}
         >
@@ -77,16 +78,45 @@ export default function OScontrolSettings({}: Props) {
             <SettingsSpeeds back={() => setActiveSection("main")} />
           ) : null}
         </div>
-        <SettingsIcon className="h-4 cursor-pointer" onClick={toggleSettings} />
+        <SettingsIcon
+          className={`mobile:h-4.5 h-4 cursor-pointer max-os_player_mobile:h-4 ${
+            showSettings && "[&>path]:fill-main"
+          } `}
+          onClick={toggleSettings}
+        />
       </ControlButton>
     </>
   );
 }
 
 function SettingsLanguages(props: { back: Function }) {
-  const { currentSource, setPlayerSettings, playerSettings, setVideoSource } =
-    useOSPlayer();
+  const {
+    videoRef,
+    currentSource,
+    setPlayerSettings,
+    playerSettings,
+    setVideoSource,
+  } = useOSPlayer();
+  const changeLanguageSource = (key: string, value: TLanguageOptions) => {
+    const saved_time = videoRef.current?.currentTime ?? 0;
 
+    setPlayerSettings((state: TplayerSettings) => ({
+      ...state,
+      lang: key,
+    }));
+    setVideoSource(value.HD ? value.HD : value.SD);
+
+    const handleLoaded = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = saved_time;
+        videoRef.current.removeEventListener("loadedmetadata", handleLoaded);
+      }
+    };
+
+    if (videoRef.current) {
+      videoRef.current.addEventListener("loadedmetadata", handleLoaded);
+    }
+  };
   return (
     <div className="flex flex-col w-[100px]">
       <SettingsButtonInside
@@ -97,16 +127,11 @@ function SettingsLanguages(props: { back: Function }) {
       />
       {Object.entries(currentSource.languages).map(([key, value]) => (
         <SettingsButtonInside
+          key={key}
           center
           title={key}
           isActive={key == playerSettings.lang}
-          onClick={() => {
-            setPlayerSettings((state: TplayerSettings) => ({
-              ...state,
-              lang: key,
-            }));
-            setVideoSource(value.HD ? value.HD : value.SD);
-          }}
+          onClick={() => changeLanguageSource(key, value)}
         />
       ))}
     </div>
@@ -115,11 +140,38 @@ function SettingsLanguages(props: { back: Function }) {
 
 type LanguageKey = "GEO" | "ENG";
 function SettingsQualities(props: { back: Function }) {
-  const { currentSource, setPlayerSettings, playerSettings, setVideoSource } =
-    useOSPlayer();
+  const {
+    videoRef,
+    currentSource,
+    setPlayerSettings,
+    playerSettings,
+    setVideoSource,
+  } = useOSPlayer();
   const [quality, setQuality] = useState<number | string>(
     playerSettings.quality
   );
+  const changeQualitySource = (key: string, value: string) => {
+    const saved_time = videoRef.current?.currentTime ?? 0;
+
+    setQuality(key);
+    setPlayerSettings((state: TplayerSettings) => ({
+      ...state,
+      quality: key,
+    }));
+
+    const handleLoaded = () => {
+      if (videoRef.current) {
+        videoRef.current.currentTime = saved_time;
+        videoRef.current.removeEventListener("loadedmetadata", handleLoaded);
+      }
+    };
+
+    if (videoRef.current) {
+      videoRef.current.addEventListener("loadedmetadata", handleLoaded);
+    }
+
+    setVideoSource(value);
+  };
 
   return (
     <div className="flex flex-col w-[100px]">
@@ -134,17 +186,11 @@ function SettingsQualities(props: { back: Function }) {
           currentSource.languages[playerSettings.lang as LanguageKey]!
         ).map(([key, value]) => (
           <SettingsButtonInside
+            key={key}
             center
             title={key}
             isActive={key == quality}
-            onClick={() => {
-              setQuality(key);
-              setPlayerSettings((state: TplayerSettings) => ({
-                ...state,
-                quality: key,
-              }));
-              setVideoSource(value);
-            }}
+            onClick={() => changeQualitySource(key, value)}
           />
         ))}
     </div>
@@ -167,6 +213,7 @@ function SettingsSpeeds(props: { back: Function }) {
       />
       {speedList.map((link_speed: number) => (
         <SettingsButtonInside
+          key={link_speed}
           center
           title={`${link_speed}`}
           isActive={speed == link_speed}
