@@ -97,7 +97,7 @@ export default function MoviePlayer() {
       return `${fileName}${stringToAdd}.${fileExtension}`;
     };
   }, []);
-  if (!adsData?.iframe_toggle || adsData?.iframe_toggle == "0") {
+  if (!adsData?.data.iframe_toggle || adsData?.data.iframe_toggle == "0") {
     return (
       <Link
         to={"https://croconet.cam"}

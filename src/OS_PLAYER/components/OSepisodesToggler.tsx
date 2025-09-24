@@ -4,7 +4,7 @@ import useOSPlayer from "./useOSPlayer";
 import { EpisodeSelectorIcon } from "./OsIcons";
 
 export default function OSepisodesToggler() {
-  const { showControls, episodes } = useOSPlayer();
+  const { showControls, episodes, isMovie } = useOSPlayer();
   const [episodesToggler, setEpisodesToggler] = useState<boolean>(false);
 
   if (!episodes) return null;
@@ -29,7 +29,7 @@ export default function OSepisodesToggler() {
 
       <div
         onClick={() => setEpisodesToggler((state) => !state)}
-        className={`cursor-pointer h-[50px] w-[65px] bg-navBg absolute bottom-0 z-[15] right-0 transition-[opacity,visibility] justify-center items-center flex  ${
+        className={`cursor-pointer h-[50px] w-auto px-4 gap-3 tracking-wide bg-navBg absolute bottom-0 z-[15] right-0 transition-[opacity,visibility] justify-center items-center flex  ${
           true
             ? showControls
               ? "opacity-100 visible z-40 top-0 translate-y-0"
@@ -38,6 +38,7 @@ export default function OSepisodesToggler() {
         }`}
       >
         <EpisodeSelectorIcon />
+        {isMovie ? "ფილმი" : "სერიალი"}
       </div>
     </>
   );

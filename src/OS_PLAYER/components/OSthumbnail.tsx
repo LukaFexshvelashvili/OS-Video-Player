@@ -13,25 +13,27 @@ import { ControlButton } from "./OScontrols";
 import { Link } from "react-router";
 
 export default function OSthumbnail() {
-  // const { updateQueryParams } = useUpdateQueryParams();
   const {
     setFirstLoad,
     firstLoad,
     play,
+    pause,
     thumbnail,
     alt,
+    srcset,
     autoplay,
     preroll,
     videoSource,
     toggleFullscreen,
     fullscreen,
     isMovie,
+    setAdPlayed,
   } = useOSPlayer();
 
   const [showPreroll, setShowPreroll] = useState(false);
   const [adPlaying, setAdPlaying] = useState(false);
   const [start, setStart] = useState(false);
-  const [skipCountdown, setSkipCountdown] = useState(3);
+  const [skipCountdown, setSkipCountdown] = useState(8);
   const [skipLocked, setSkipLocked] = useState(true);
   const [adMuted, setAdMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -51,9 +53,11 @@ export default function OSthumbnail() {
 
       // Episode changed, reset preroll state completely
       setShowPreroll(true);
+      setAdPlayed(false);
+      pause();
       setAdPlaying(false);
       setStart(true); // Set to true so ad can start immediately
-      setSkipCountdown(3);
+      setSkipCountdown(8);
       setSkipLocked(true);
       setIsPlaying(false);
       setAdCurrentTime(0);
@@ -69,11 +73,11 @@ export default function OSthumbnail() {
     if (preroll && preroll.video) {
       setShowPreroll(true);
       setSkipLocked(true);
-      setSkipCountdown(3);
+      setSkipCountdown(8);
     } else {
+      setAdPlayed(true);
       play();
     }
-    // updateQueryParams({ quality: "HD" });
   };
 
   // Auto-start ad when autoplay is enabled
@@ -104,6 +108,7 @@ export default function OSthumbnail() {
     setShowPreroll(false);
     setAdPlaying(false);
     setTimeout(() => {
+      setAdPlayed(true);
       play();
     }, 100);
   };
@@ -113,6 +118,7 @@ export default function OSthumbnail() {
     setShowPreroll(false);
     setAdPlaying(false);
     setTimeout(() => {
+      setAdPlayed(true);
       play();
     }, 100);
   };
@@ -200,6 +206,7 @@ export default function OSthumbnail() {
             onPlay={() => {
               setAdPlaying(true);
               setIsPlaying(true);
+              pause();
             }}
             onPause={() => {
               setAdPlaying(false);

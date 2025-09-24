@@ -219,8 +219,8 @@ export type AdsResponse = {
       percentage: number;
       link: string;
     }[];
+    iframe_toggle: boolean | string | number;
   };
-  iframe_toggle: boolean | string | number;
 };
 export async function fetchAds(): Promise<AdsResponse> {
   const { data } = await api.get(`/ads/get.php`);
