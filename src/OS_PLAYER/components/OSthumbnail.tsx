@@ -196,6 +196,8 @@ export default function OSthumbnail() {
             key={adVideoKey}
             ref={videoRef}
             src={preroll.video}
+            playsInline
+            webkit-playsinline
             autoPlay
             controls={false}
             muted={adMuted}
