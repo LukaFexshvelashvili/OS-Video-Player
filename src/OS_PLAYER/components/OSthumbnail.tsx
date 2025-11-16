@@ -20,7 +20,6 @@ export default function OSthumbnail() {
     pause,
     thumbnail,
     alt,
-    srcset,
     autoplay,
     preroll,
     videoSource,
@@ -33,7 +32,7 @@ export default function OSthumbnail() {
   const [showPreroll, setShowPreroll] = useState(false);
   const [adPlaying, setAdPlaying] = useState(false);
   const [start, setStart] = useState(false);
-  const [skipCountdown, setSkipCountdown] = useState(8);
+  const [skipCountdown, setSkipCountdown] = useState(3);
   const [skipLocked, setSkipLocked] = useState(true);
   const [adMuted, setAdMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -57,7 +56,7 @@ export default function OSthumbnail() {
       pause();
       setAdPlaying(false);
       setStart(true); // Set to true so ad can start immediately
-      setSkipCountdown(8);
+      setSkipCountdown(3);
       setSkipLocked(true);
       setIsPlaying(false);
       setAdCurrentTime(0);
@@ -73,7 +72,7 @@ export default function OSthumbnail() {
     if (preroll && preroll.video) {
       setShowPreroll(true);
       setSkipLocked(true);
-      setSkipCountdown(8);
+      setSkipCountdown(3);
     } else {
       setAdPlayed(true);
       play();
