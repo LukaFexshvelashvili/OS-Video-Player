@@ -22,7 +22,7 @@ function Player() {
   useEffect(() => {
     if (id && firstRender) {
       axios
-        .get("https://moviesgo.ge/server/getmoviet.php?id=" + id)
+        .get("https://moviesgo.ge/server/getmovie.php?id=" + id)
         .then((response) => {
           setFirstRender(false);
           if (response.data.exists == true) {
@@ -53,7 +53,7 @@ function Player() {
       }));
     }
   }, [result]);
-  const basename = "https://cdn.moviesgo.ge/";
+  const basename = "https://cdn.storagefiles.in/";
 
   function addStringToThumbnail(thumbnailUrl: string, stringToAdd: string) {
     const fileName = thumbnailUrl.split(".").slice(0, -1).join(".");
@@ -78,7 +78,7 @@ function Player() {
         source={playerData.initial}
         thumbnail={basename + result.thumbnail_url}
         alt="rick and morty"
-        autoplay
+        autoplay={false}
         srcset={`
   ${basename + addStringToThumbnail(result.thumbnail_url, "_sm2")} 480w,
         ${basename + addStringToThumbnail(result.thumbnail_url, "_sm")} 780w,
