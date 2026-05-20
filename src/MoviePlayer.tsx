@@ -4,17 +4,17 @@ import OSVideoPlayer, {
   TLanguageOptions,
   TSeriesData,
 } from "./OS_PLAYER/OSVideoPlayer";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { image_resize, selectPrerollAd } from "./lib/hooks/Customs";
-import { fetchAds, fetchMovie } from "./api/ServerFunctions";
+import { fetchAds, fetchMovie, fetchTmdbMovie } from "./api/ServerFunctions";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
 
-export default function MoviePlayer() {
+export default function MoviePlayer({ tmdb }: { tmdb?: boolean }) {
   const { id } = useParams();
   const { data: movie_data } = useQuery({
     queryKey: ["movie", id],
-    queryFn: () => fetchMovie(Number(id)),
+    queryFn: () => (tmdb ? fetchTmdbMovie(Number(id)) : fetchMovie(Number(id))),
   });
   const movie = movie_data?.movie;
   // Fetch ads using React Query
@@ -97,6 +97,13 @@ export default function MoviePlayer() {
       return `${fileName}${stringToAdd}.${fileExtension}`;
     };
   }, []);
+
+  useEffect(() => {
+    if (movie?.name) {
+      document.title = movie.name;
+    }
+  }, [movie?.name]);
+
   if (!adsData?.data.iframe_toggle || adsData?.data.iframe_toggle == "0") {
     return (
       <Link

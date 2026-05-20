@@ -153,6 +153,12 @@ export async function fetchMovie(id: number) {
   });
   return data;
 }
+export async function fetchTmdbMovie(id: number) {
+  const { data } = await api.get(`/movie/tmdb_get.php`, {
+    params: { id: id },
+  });
+  return data;
+}
 export async function fetchCasts(mid: number) {
   const { data } = await api.get(
     `https://api.themoviedb.org/3/movie/${mid}/credits`,

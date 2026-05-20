@@ -7,6 +7,7 @@ export default function App() {
       <div className="min-h-screen w-full bg-bodyBg overflow-hidden">
         <Routes>
           <Route path="/:id" element={<MoviePlayer />} />
+          <Route path="/tmdb/:id" element={<MoviePlayer tmdb={true} />} />
         </Routes>
       </div>
     </>
